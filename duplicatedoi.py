@@ -36,7 +36,10 @@ def browse_dir(local_dir, f_to_call, *res):
 
 def add_doi(entity, res):
     if "type" in entity and entity["type"] == "doi":
-        res.add(entity["iri"])
+        id_string = ""
+        if "id" in entity:
+            id_string = entity["id"]
+        res[entity["iri"]] = id_string
 
 
 def duplicate_doi(entity, dois, res):
@@ -45,7 +48,7 @@ def duplicate_doi(entity, dois, res):
     if "identifier" in entity:
         for cur_id in entity["identifier"]:
             if cur_id in dois:
-                cur_dois.append(cur_id)
+                cur_dois.append({"r": cur_id, "t": dois[cur_id]})
 
         if len(cur_dois) > 1:
             res[entity["iri"]] = cur_dois
@@ -62,7 +65,7 @@ args = arg_parser.parse_args()
 print("Start duplicateddoi")
 
 # Find all DOIs
-all_dois = set()
+all_dois = {}
 browse_dir("id", add_doi, all_dois)
 
 # Get all duplicated DOIs
